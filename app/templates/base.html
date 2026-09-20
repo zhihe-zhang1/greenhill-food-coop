@@ -1,0 +1,8 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}Greenhill Food Co-op{% endblock %}</title><link rel="stylesheet" href="/static/css/app.css"></head>
+<body><header class="topbar"><a class="brand" href="/"><span class="brand-mark">G</span><span><strong>Greenhill</strong><small>Food Co-op</small></span></a>
+{% if current_user %}<nav>
+{% if current_user.role=='member' %}<a href="/member">Dashboard</a><a href="/member/products">Products</a><a href="/member/order">My order</a>{% elif current_user.role=='coordinator' %}<a href="/coordinator">Dashboard</a><a href="/coordinator/products">Products</a><a href="/coordinator/members">Members</a><a href="/coordinator/rounds">Rounds</a><a href="/coordinator/audit">Audit</a>{% else %}<a href="/">Packing</a>{% endif %}
+</nav><div class="userbox"><span>{{current_user.name}}</span><span class="role">{{current_user.role}}</span><form method="post" action="/logout"><input type="hidden" name="csrf_token" value="{{csrf_token}}"><button class="linkbtn">Sign out</button></form></div>{% endif %}</header>
+<main class="shell">{% if flash %}<div class="flash {{flash.kind}}">{{flash.message}}</div>{% endif %}{% block content %}{% endblock %}</main>
+<footer>Greenhill Food Co-op · ISYS3001 teaching project · No real payment processing</footer><script src="/static/js/app.js"></script>{% block scripts %}{% endblock %}</body></html>
