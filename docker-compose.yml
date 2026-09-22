@@ -1,0 +1,24 @@
+services:
+  web:
+    build: .
+    container_name: greenhill-food-coop
+    ports:
+      - "8000:8000"
+    environment:
+      APP_NAME: Greenhill Food Co-op
+      APP_SECRET: ${APP_SECRET:-change-me-before-real-use}
+      APP_DB_PATH: /app/data/greenhill.db
+      APP_DEBUG: "0"
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped

@@ -1,0 +1,8 @@
+ROLE_MEMBER = 'member'
+ROLE_COORDINATOR = 'coordinator'
+ROLE_PACKER = 'packer'
+ROUND_OPEN = 'open'
+ROUND_CLOSED = 'closed'
+ROUND_PACKED = 'packed'
+SALE_UNIT = 'unit'
+SALE_KG = 'kg'
