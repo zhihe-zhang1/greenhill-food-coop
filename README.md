@@ -177,10 +177,10 @@ This branch is used for development work completed by **Zhihe Zhang**.
 For Assessment 3, additional branches may be created from Jira user stories, for example:
 
 ```text
-feature/GHC-01-member-login
-feature/GHC-02-product-list
-feature/GHC-03-place-order
-feature/GHC-04-edit-order
+feature/MSD426GXUST34-5-member-login
+feature/MSD426GXUST34-6-product-list
+feature/MSD426GXUST34-7-place-order
+feature/MSD426GXUST34-8-edit-order
 ```
 
 Completed work should be reviewed through a Pull Request before being merged into `main`.
@@ -504,16 +504,15 @@ Supporting project documentation is maintained under:
 docs/
 ```
 
-Documentation may include:
+Current repository documentation includes:
 
-* Configuration management
-* Git workflow
-* Deployment instructions
-* Jira mapping
-* Sprint planning
-* Test plans
-* Release plans
-* Project handover material
+* [Configuration management](docs/CONFIGURATION_MANAGEMENT.md)
+* [Git workflow](docs/GIT_WORKFLOW.md)
+* [Deployment instructions](docs/DEPLOYMENT.md)
+* [Assessment 2 evidence checklist](docs/A2_EVIDENCE_CHECKLIST.md)
+* [Change log](CHANGELOG.md)
+
+Assessment 3 documentation may additionally include Jira mapping, sprint planning, test plans, release plans and project handover material
 
 ---
 
