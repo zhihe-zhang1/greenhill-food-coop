@@ -1,37 +1,15 @@
 # Changelog
 
-All notable project changes are recorded here.
+## 0.4.0
+- Added printable packing sheet and actual packed quantity capture.
+- Added audit log and coordinator round summaries.
 
-## [Unreleased]
+## 0.3.0
+- Added member order creation, editing and cancellation.
+- Added unit-vs-kilogram pricing with frozen round prices.
 
-- Configuration-management and Git workflow documentation.
-- Assessment 2 evidence checklist.
+## 0.2.0
+- Added coordinator management for members, products and rounds.
 
-## [0.4.0] - 2026-09-22
-
-### Added
-- Dockerfile and Docker Compose deployment configuration.
-- Deployment guide and application health check.
-- GitHub Actions automated test workflow.
-
-## [0.3.0] - 2026-09-21
-
-### Added
-- Automated tests for pricing, order rules, security and HTTP routes.
-- Main application wiring, shared frontend layout, CSS and JavaScript.
-- Packing workflow and totals/health API.
-
-## [0.2.0] - 2026-09-20
-
-### Added
-- Member ordering workflow and order history.
-- Coordinator member, product and round management.
-- Coordinator dashboard, order reporting and audit views.
-- Unit-based and kilogram-based pricing services.
-
-## [0.1.0] - 2026-09-19
-
-### Added
-- Initial project structure and configuration.
-- SQLite schema and demonstration data.
-- Authentication, password hashing, role access and CSRF handling.
+## 0.1.0
+- Initial FastAPI application, SQLite schema, authentication and demo data.
