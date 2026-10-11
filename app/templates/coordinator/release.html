@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block title %}Release readiness · Greenhill{% endblock %}{% block content %}
+<div class="pagehead"><div><span class="eyebrow">RELEASE MANAGEMENT</span><h1>Release readiness</h1><p>{{app_name}} · checklist for the Scrum sprint close.</p></div><a class="btn primary" href="/coordinator/rounds">Review rounds</a></div>
+<div class="card table-card"><table><thead><tr><th>Area</th><th>Status</th><th>Evidence</th></tr></thead><tbody>{% for name,status,note in checks %}<tr><td><b>{{name}}</b></td><td><span class="pill {% if status=='Ready' %}open{% else %}closed{% endif %}">{{status}}</span></td><td>{{note}}</td></tr>{% endfor %}</tbody></table></div>
+<div class="section-title"><h2>Recent rounds</h2></div><div class="grid3">{% for r in rounds %}<div class="card kpi"><span>Round #{{r.number}}</span><b>{{r.status}}</b><small>Pickup {{r.pickup_at[:16]}}</small><div class="actions" style="margin-top:12px"><a href="/reports/round/{{r.id}}">Report</a><a href="/packing/round/{{r.id}}">Packing</a></div></div>{% endfor %}</div>
+{% endblock %}
