@@ -13,7 +13,8 @@ def login_page(request: Request):
 
 @router.post('/login')
 def login(request: Request, email: str=Form(...), password: str=Form(...), csrf_token: str=Form(...)):
-    if not valid_csrf(request.session,csrf_token): return render(request,'login.html',error='Session expired. Refresh and try again.'),403
+    if not valid_csrf(request.session,csrf_token):
+        response=render(request,'login.html',error='Session expired. Refresh and try again.'); response.status_code=403; return response
     user=one('SELECT * FROM users WHERE lower(email)=lower(?) AND active=1',(email.strip(),))
     if not user or not verify_password(password,user['password_hash']):
         return render(request,'login.html',error='Invalid email or password.')
