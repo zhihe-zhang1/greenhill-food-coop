@@ -50,7 +50,10 @@ def cancel_order(order_id, user_id):
     order=one('''SELECT o.*,r.status round_status,r.closes_at FROM orders o JOIN rounds r ON r.id=o.round_id
                  WHERE o.id=? AND o.user_id=?''',(order_id,user_id))
     if not order: raise OrderError('Order not found.')
-    if not round_is_editable(order): raise OrderError('Closed-round orders cannot be cancelled.')
+    # The joined row carries orders.status in `status`, so the round window must be
+    # read from `round_status` — passing the raw row made every cancel fail as "closed".
+    if not round_is_editable({'status':order['round_status'],'closes_at':order['closes_at']}):
+        raise OrderError('Closed-round orders cannot be cancelled.')
     with connect() as con: con.execute("UPDATE orders SET status='cancelled',updated_at=CURRENT_TIMESTAMP WHERE id=?",(order_id,))
 
 def order_total(order_id, packed=False):

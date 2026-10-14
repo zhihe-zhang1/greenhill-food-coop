@@ -1,7 +1,13 @@
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 def quantity_to_milli(value: str, sale_type: str) -> int:
-    q = Decimal(str(value or '0').strip())
+    raw = str(value if value is not None else '').strip()
+    if not raw: return 0
+    try:
+        q = Decimal(raw)
+    except InvalidOperation:
+        raise ValueError('Quantity must be a number.')
+    if not q.is_finite(): raise ValueError('Quantity must be a number.')
     if q <= 0: return 0
     if sale_type == 'unit' and q != q.to_integral_value():
         raise ValueError('Unit products require a whole-number quantity.')
