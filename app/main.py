@@ -29,7 +29,9 @@ def home(request:Request):
     return RedirectResponse('/coordinator',303)
 
 @app.exception_handler(403)
-async def forbidden(request:Request,exc): return render(request,'errors/403.html'),403
+async def forbidden(request:Request,exc):
+    response=render(request,'errors/403.html'); response.status_code=403; return response
 
 @app.exception_handler(404)
-async def not_found(request:Request,exc): return render(request,'errors/404.html'),404
+async def not_found(request:Request,exc):
+    response=render(request,'errors/404.html'); response.status_code=404; return response
