@@ -10,7 +10,7 @@
 
 Date: (fill in, e.g. Week 5 tutorial)
 Facilitator / rotating PM: Zhihe Zhang (zhihe-zhang1)
-Attendees: Zhihe Zhang, Haolin Li, Member C
+Attendees: Zhihe Zhang, Haolin Li, XiaohanMa
 
 ### Progress since last meeting
 - Repository skeleton, SQLite schema and seed data agreed; module ownership confirmed.
@@ -39,7 +39,7 @@ Attendees: Zhihe Zhang, Haolin Li, Member C
 | Create Jira stories with acceptance criteria and story points | Zhihe Zhang | End of planning |
 | Publish the branch and commit-message convention | Zhihe Zhang | End of planning |
 | Implement authentication, role guards and CSRF protection | Haolin Li | Sprint 1 |
-| Implement packing sheet and quantity recording | Member C | Sprint 2 |
+| Implement packing sheet and quantity recording | XiaohanMa | Sprint 2 |
 
 ---
 
@@ -47,7 +47,7 @@ Attendees: Zhihe Zhang, Haolin Li, Member C
 
 Date: (fill in)
 Facilitator / rotating PM: Haolin Li (Moran0405, member B)
-Attendees: Zhihe Zhang, Haolin Li, Member C
+Attendees: Zhihe Zhang, Haolin Li, XiaohanMa
 
 ### Progress since last meeting
 - Member order flow implemented: order create / edit / cancel plus unit-vs-kg conversion
@@ -84,15 +84,15 @@ Attendees: Zhihe Zhang, Haolin Li, Member C
 | Fix DEF-002 in `order_service.cancel_order` | Haolin Li | Same day |
 | Extend `test_security.py`, `test_pricing.py`, `test_order_rules.py` with regression cases | Haolin Li | Same day |
 | Review and approve the login branch PR (shared file) | Zhihe Zhang | Next stand-up |
-| Verify packing quantities reconcile with member orders | Member C | Next stand-up |
+| Verify packing quantities reconcile with member orders | XiaohanMa | Next stand-up |
 
 ---
 
 ## Memo 3 - Sprint review and retrospective preparation
 
 Date: (fill in)
-Facilitator / rotating PM: Member C
-Attendees: Zhihe Zhang, Haolin Li, Member C
+Facilitator / rotating PM: XiaohanMa
+Attendees: Zhihe Zhang, Haolin Li, XiaohanMa
 
 ### Progress since last meeting
 - Four member-scope stories completed and merged through reviewed pull requests
@@ -116,5 +116,5 @@ Attendees: Zhihe Zhang, Haolin Li, Member C
 | Action | Owner | Due |
 |---|---|---|
 | Tag `v1.0.0` and create the GitHub release | Zhihe Zhang | Closure |
-| Complete handover and known-issue notes | Member C | Closure |
+| Complete handover and known-issue notes | XiaohanMa | Closure |
 | Prepare the report's testing section and defect analysis | Haolin Li | Closure |

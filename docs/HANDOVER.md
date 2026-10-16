@@ -3,7 +3,7 @@
 **Project:** Greenhill Food Co-op Ordering System
 **Repository:** https://github.com/zhihe-zhang1/greenhill-food-coop
 **Release handed over:** v1.0.0
-**Handover prepared by:** Member C (testing, review and release phase), reviewed by the team
+**Handover prepared by:** XiaohanMa (testing, review and release phase), reviewed by the team
 
 ## Delivered against scope
 

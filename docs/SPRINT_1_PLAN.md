@@ -9,7 +9,7 @@ Sprint names, dates and capacity must match the Jira board (`MSD426GXUST34`).
 |---|---|---|
 | Project initiation and sprint planning | Zhihe Zhang (zhihe-zhang1) | Requirements confirmed, Jira backlog created, acceptance criteria and branch conventions agreed |
 | Development execution and daily tracking | Haolin Li (Moran0405, member B) | Orders, pricing and member features delivered; blockers, changes and stand-ups recorded in Jira |
-| Testing, review and release | Member C | Defect regression, sprint review, release checks and closure evidence |
+| Testing, review and release | XiaohanMa | Defect regression, sprint review, release checks and closure evidence |
 
 ## Sprint goal (delivered sprint)
 
@@ -37,8 +37,8 @@ integrations, notifications and mobile work in the product backlog.
 | GHC-A3-08 Member product browsing and dashboard | Haolin Li (B) | 3 | MSD426GXUST34 (see board) | HTTP tests for member-only access, round status and product listing |
 | GHC-A3-09 Member orders and unit/kg pricing rules | Haolin Li (B) | 5 | MSD426GXUST34 (see board) | Unit tests for price snapshot, quantity conversion, edit/cancel rules |
 | GHC-A3-10 Member order UI and business unit tests | Haolin Li (B) | 5 | MSD426GXUST34 (see board) | UI-level tests for order form and order detail; full regression run |
-| GHC-A3-11 Packing and dispatch of exact quantities | Member C | 5 | MSD426GXUST34 (see board) | Integration tests for packing sheet and packed quantities |
-| GHC-A3-12 Automated tests and CI | Member C | 3 | MSD426GXUST34 (see board) | GitHub Actions workflow executing the pytest suite |
+| GHC-A3-11 Packing and dispatch of exact quantities | XiaohanMa | 5 | MSD426GXUST34 (see board) | Integration tests for packing sheet and packed quantities |
+| GHC-A3-12 Automated tests and CI | XiaohanMa | 3 | MSD426GXUST34 (see board) | GitHub Actions workflow executing the pytest suite |
 | GHC-A3-04 Coordinator totals, audit and restricted API | Zhihe Zhang (A) | 5 | MSD426GXUST34 (see board) | Service tests for totals, audit log and API access control |
 | GHC-A3-05 Operational report and CSV export | Zhihe Zhang (A) | 5 | MSD426GXUST34 (see board) | Report, metrics and CSV tests plus manual CSV download check |
 

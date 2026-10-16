@@ -1,8 +1,8 @@
 # Sprint Review and Retrospective
 
 Date: (fill in)
-Facilitator: Member C (rotating PM for testing, review and release)
-Participants: Zhihe Zhang (zhihe-zhang1), Haolin Li (Moran0405), Member C
+Facilitator: XiaohanMa (rotating PM for testing, review and release)
+Participants: Zhihe Zhang (zhihe-zhang1), Haolin Li (Moran0405), XiaohanMa
 Reviewer / stakeholder present: tutor or team-appointed reviewer (fill in)
 
 ## Review
