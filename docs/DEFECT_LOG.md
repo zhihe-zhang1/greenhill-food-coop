@@ -230,23 +230,28 @@ fresh `app.db` on first request.
 | **Severity / Priority** | High / High |
 | **Status** | Fixed |
 
-**Symptom** — A member cancels an order, but the packing sheet for that round still lists its
-lines and the packer can submit a packed quantity. The line is then persisted with a non-zero
-`packed_milli` against an order the member has already withdrawn, and the value flows into the
-invoice/packing report totals.
+**Symptom** — A member cancels an order. The order correctly disappears from the packing sheet, but
+the update endpoint has no idea the order is cancelled, so it still accepts a packed quantity for any
+of its lines. The line is persisted with a non-zero `packed_milli` against an order the member has
+already withdrawn, and that quantity then flows into the packing completion metric and the CSV
+export. The list view and the update path disagreed about the same order.
 
 **Steps to reproduce**
 1. Log in as `member@greenhill.local` and place an order in an open round.
-2. Cancel the order (status becomes `cancelled`).
-3. Log in as `coordinator@greenhill.local`, open `/packing/round/<id>`.
-4. The cancelled line is still listed; submit a packed quantity → accepted.
+2. Log in as `coordinator@greenhill.local`, open `/packing/round/<id>` and note the line id.
+3. Back as the member, cancel that order (status becomes `cancelled`).
+4. POST a packed quantity for the line id — the form still works if the sheet was left open, and a
+   crafted POST works regardless:
+   `curl -b cookies -d 'packed_qty=1&initials=BN&note=x&csrf_token=<token>' /packing/line/<line_id>`
+5. The response flashes "Packed quantity saved." and `order_lines.packed_milli` is now non-zero for
+   an order the member has already cancelled.
 
-**Root cause** — The packing sheet query joined `round_products` and `products` but never joined
-`orders`, so the order status was not selected; the update handler then had no status to check and
-wrote the value unconditionally.
+**Root cause** — The update query joined `orders` only to read the round id, never selecting
+`o.status`, so the handler had no status to test and wrote the value unconditionally. `packing_rows()`
+already filtered on `o.status='submitted'`, which is why the sheet itself looked correct and the hole
+stayed invisible in normal use.
 
-**Fix** — Join `orders` so the status is available to both the list and the update path, exclude
-cancelled lines from the sheet, and refuse the update server-side:
+**Fix** — Select the order status in the update query and refuse the update server-side:
 
 ```python
 LINE_SQL = '''SELECT ol.*, o.round_id, o.status order_status, p.sale_type
@@ -257,14 +262,15 @@ LINE_SQL = '''SELECT ol.*, o.round_id, o.status order_status, p.sale_type
               WHERE ol.id = ?'''
 # update handler
 if row['order_status'] == 'cancelled':
-    flash(request, 'This order was cancelled and cannot be packed.', 'error')
+    flash(request, 'This order was cancelled, so its lines cannot be packed.', 'error')
     return back
 ```
 
-**Retest** — `test_cancelled_order_lines_cannot_be_packed`,
-`test_cancelled_order_is_not_listed_on_the_packing_sheet` → pass. Manually re-ran the four steps
-above: the line is gone from the sheet and a crafted POST to `/packing/line/<id>` flashes the error
-and changes nothing.
+**Retest** — `test_cancelled_order_lines_cannot_be_packed` passes, and it is one of the 5 tests that
+fail when `app/routers/packing.py` is reverted to the pre-fix version. `test_cancelled_order_is_not_listed_on_the_packing_sheet`
+passes both before and after, which confirms the sheet listing was never the broken half. Manually
+re-ran the steps above: the crafted POST now flashes "This order was cancelled, so its lines cannot
+be packed." and `packed_milli` stays unchanged.
 
 **Impact** — Data-integrity blocker: withdrawn orders could be packed and invoiced.
 
@@ -283,8 +289,10 @@ and changes nothing.
 `packed_milli = 0`) and flashes "Packed quantity saved." The packer gets a false confirmation and
 the line looks "packed" in reports even though nothing was weighed.
 
-**Root cause** — `quantity_to_milli('')` returns `0` by design (DEF-003), and the handler compared
-the result but did not treat `<= 0` as "nothing entered"; it stored the zero and reported success.
+**Root cause** — `quantity_to_milli('')` and `quantity_to_milli('0')` both return `0` by design
+(DEF-003), and the handler had no guard at all: it wrote whatever the conversion produced and always
+flashed success. `packing completion` counts lines where `packed_milli IS NOT NULL`, so storing `0`
+turned an unweighed line into a "packed" one.
 
 **Fix** — Reject non-positive input before writing, with a message that says what to do:
 
@@ -295,49 +303,68 @@ if milli <= 0:
     return back
 ```
 
-**Retest** — `test_blank_or_zero_quantity_is_not_recorded_as_packed`,
-`test_fractional_quantity_is_rejected_for_a_unit_product`,
-`test_packer_records_a_short_packed_weight_for_a_kg_product` → pass; the stored `packed_milli` is
-unchanged after a blank submit.
+**Retest** — `test_blank_or_zero_quantity_is_not_recorded_as_packed` passes (it is one of the 5 tests
+that fail against the pre-fix file, and it exercises `''`, `'0'` and `'   '`);
+`test_fractional_quantity_is_rejected_for_a_unit_product` and
+`test_packer_records_a_short_packed_weight_for_a_kg_product` pass; the stored `packed_milli` stays
+`NULL` after every blank submit.
 
 **Impact** — Misleading UI feedback and dirty data in the packing/invoice reports.
 
 ---
 
-## DEF-008 — 会话失效与未知订单行只呈现底层错误
+## DEF-008 — 失败路径静默通过：CSRF 失效无提示、未知编号重定向到坏地址
 
 | Field | Value |
 |---|---|
 | **Story** | MSD426GXUST34-11 (分拣与打包流程) |
-| **Found by** | `tests/test_packing.py::test_forged_csrf_token_cannot_change_packed_quantity` 与 `::test_unknown_line_returns_not_found_instead_of_a_broken_redirect` |
-| **Severity / Priority** | Medium / Low |
+| **Found by** | `tests/test_packing.py::test_forged_csrf_token_cannot_change_packed_quantity`、`::test_unknown_line_returns_not_found_instead_of_a_broken_redirect`、`::test_unknown_round_returns_not_found` |
+| **Severity / Priority** | Medium / Medium |
 | **Status** | Fixed |
 
-**Symptom** — Two edge cases behaved badly. (a) A stale form (expired session / forged CSRF)
-posted to `/packing/line/<id>` produced a bare `403` page with no navigation back to the sheet.
-(b) A POST for an order line that does not exist raised an unhandled `TypeError` from
-`row['round_id']` on `None` (HTTP 500) instead of a 404.
+**Symptom** — Three failure paths gave the packer no usable signal.
 
-**Root cause** — The handler validated CSRF but returned the framework's default error, and it
-looked up the row after building the redirect target, so the `None` case was not guarded.
+(a) A stale form — an expired session or a forged CSRF token — posted to `/packing/line/<id>`. The
+handler skipped its whole `if row and valid_csrf(...)` body and then redirected back to the sheet, so
+the page reloaded looking exactly as before with no message at all. A rejected submission was
+indistinguishable from a saved one.
 
-**Fix** — Look up the line first, return a proper 404, and treat a failed CSRF check as a
-recoverable user error that flashes and redirects back to the sheet:
+(b) A POST for an order line that does not exist redirected to `/packing/round/` — a URL with the
+round id chopped off — instead of answering 404.
+
+(c) GET `/packing/round/<unknown-id>` rendered an empty packing sheet with HTTP 200 instead of 404,
+so a broken link looked like a valid round that happened to contain nothing.
+
+**Root cause** — The update handler wrapped everything in `if row and valid_csrf(...)` with no `else`
+branch, so every failure fell through to the same silent redirect; the redirect target was built as
+`row['round_id'] if row else ''`, which produced the truncated URL. The sheet handler passed
+`one('SELECT * FROM rounds WHERE id=?', ...)` straight into the template without checking whether it
+returned a row.
+
+**Fix** — Look the line up first and answer 404, check the round before rendering, and treat a failed
+CSRF check as a recoverable user error that flashes and redirects back to the sheet:
 
 ```python
+# GET /packing/round/{rid}
+rnd = one('SELECT * FROM rounds WHERE id=?', (rid,))
+if not rnd:
+    raise HTTPException(404, 'Round not found.')
+
+# POST /packing/line/{line_id}
 row = one(LINE_SQL, (line_id,))
 if not row:
     raise HTTPException(404, 'Order line not found.')
 back = RedirectResponse(f"/packing/round/{row['round_id']}", status_code=303)
-if not valid_csrf(request, submitted):
-    flash(request, 'Session expired. Reload the sheet and try again.', 'error')
+if not valid_csrf(request.session, submitted):
+    flash(request, 'Session expired. Refresh the packing sheet and try again.', 'error')
     return back
 ```
 
-**Retest** — `test_forged_csrf_token_cannot_change_packed_quantity` (expects a flash + 303 back to
-the sheet) and `test_unknown_line_returns_not_found_instead_of_a_broken_redirect` → pass;
-`test_successful_pack_is_audited_and_printed_on_the_sheet` confirms the happy path still records
-`audit_log`.
+**Retest** — All three tests pass, and `test_forged_csrf_token_cannot_change_packed_quantity` and
+`test_unknown_line_returns_not_found_instead_of_a_broken_redirect` are among the 5 tests that fail
+when `app/routers/packing.py` is reverted to the pre-fix version;
+`test_successful_pack_is_audited_and_printed_on_the_sheet` confirms the happy path still writes
+`audit_log` with `action='pack'` and `detail='packed=2'`.
 
 **Impact** — Poor recoverability for the packer and an unhandled 500 on a malformed request.
 
