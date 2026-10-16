@@ -1,0 +1,34 @@
+# Keep the build context small and free of local state.
+# Without this file `COPY . .` also copied venv/ (hundreds of megabytes) and any
+# local data/greenhill.db, so the image shipped a development environment and a
+# developer database (DEF-005 in the deployment review).
+
+# version control and CI
+.git
+.gitignore
+.github
+
+# local virtual environments
+venv
+.venv
+
+# python caches
+__pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# local runtime state and secrets
+data
+*.db
+*.sqlite3
+.env
+
+# coverage and editor artefacts
+.coverage
+coverage.xml
+htmlcov
+.idea
+.vscode
+.DS_Store
